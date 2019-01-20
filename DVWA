@@ -125,3 +125,8 @@ l'applicazione lato server non analizza da dove viene la richiesta.
 abilitare modulo php -->   a2enmod php7.2 
 disabilitare modulo php -->   a2dismod php7.2 
 
+
+
+***CLICKJACKING***
+la ittima apre la pagina contenente un form sul suo sito dell'attaccante. La pagina e' posizionata su una pagina con iframe e con 2 text box sopra le text-box originali.
+La vittima inserisce le credenziali e verra' reindirizzata al form corretto.
