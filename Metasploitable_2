@@ -41,11 +41,11 @@ nmap mi risponde cosi'
 	nmap mi risponde in questo modo:
 		PORT   STATE SERVICE VERSION
 		21/tcp open  ftp     vsftpd 2.3.4
-		
+
 	A questo punto, apro metasploit e vedo di capire se esiste un exploit per la versione dell'ftp server. Digito: 
 		search vsftpd
 
-	msf risponde 
+	msf mi risponde 
 		exploit/unix/ftp/vsftpd_234_backdoor
 		(https://www.rapid7.com/db/modules/exploit/unix/ftp/vsftpd_234_backdoor)
 
@@ -64,7 +64,7 @@ nmap mi risponde cosi'
 	namp risponde cosi'
 		PORT   STATE SERVICE VERSION
 		22/tcp open  ssh     OpenSSH 4.7p1 Debian 8ubuntu1 (protocol 2.0)
-		
+
 	Apro metasploit (msfconsole) e cerco l'exploit per la versione del servizio ssh. 
 		search ssh
 		scelgo ssh login
@@ -105,4 +105,16 @@ nmap mi risponde cosi'
 
 	Volendo proseguire, si potrebbe fare priviledge escalation.
 
-	
+***23/tcp   open  telnet***
+	Trovato l'IP con le porte aperte, comincio con il server ftp: 
+		nmap -sV 192.168.236.139 -p 23
+
+	nmap mi risponde in questo modo:
+		PORT   STATE SERVICE VERSION
+		23/tcp open  telnet  Linux telnetd
+
+
+	A questo punto, usando il terminale mi connetto in telnet all'IP
+		telnet 192.168.236.139
+
+	Telnet risponde mostrandomi le credenziali di accesso. In altri casi, si potrebbe tentare un bruteforce con hydra.
