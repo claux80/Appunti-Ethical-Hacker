@@ -41,13 +41,11 @@ nmap mi risponde cosi'
 	nmap mi risponde in questo modo:
 		PORT   STATE SERVICE VERSION
 		21/tcp open  ftp     vsftpd 2.3.4
-		MAC Address: 00:0C:29:FA:DD:2A (VMware)
-		Service Info: OS: Unix
-
+		
 	A questo punto, apro metasploit e vedo di capire se esiste un exploit per la versione dell'ftp server. Digito: 
 		search vsftpd
 
-	msf mi risponde 
+	msf risponde 
 		exploit/unix/ftp/vsftpd_234_backdoor
 		(https://www.rapid7.com/db/modules/exploit/unix/ftp/vsftpd_234_backdoor)
 
@@ -66,9 +64,7 @@ nmap mi risponde cosi'
 	namp risponde cosi'
 		PORT   STATE SERVICE VERSION
 		22/tcp open  ssh     OpenSSH 4.7p1 Debian 8ubuntu1 (protocol 2.0)
-		MAC Address: 00:0C:29:FA:DD:2A (VMware)
-		Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
-
+		
 	Apro metasploit (msfconsole) e cerco l'exploit per la versione del servizio ssh. 
 		search ssh
 		scelgo ssh login
